@@ -1,0 +1,207 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Terraform</title>
+
+    <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="../reveal.js/css/theme/blood.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h1>Terraform</h1>
+          <h2>Rennes AWS User Group</h2>
+        </section>
+        <section>
+          <h2>Who Am I ?</h2>
+          <ul>
+            <li class="fragment">Adrien Bréfort</li>
+            <li class="fragment">Public Cloud Lead DevOps at <a href="http://www.claranet.fr/">Claranet</a></li>
+            <li class="fragment">Working with AWS everyday</li>
+          </ul>
+        </section>
+        <section>
+          <section>
+            <h2>Terraform</h2>
+          </section>
+          <section>
+            <h3>What is it ?</h3>
+            <ul>
+              <li class="fragment">Infrastructure management tool</li>
+              <li class="fragment">Infrastructure as code</li>
+              <li class="fragment">Developed by <a href="https://www.hashicorp.com/">Hashicorp</a></li>
+              <li class="fragment">Infrastructure counterpart of tools like Salt, Puppet, Ansible…</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Use cases at Claranet</h3>
+            <ul>
+              <li class="fragment">Deployment of new platforms</li>
+              <li class="fragment">Maintenance of existing platforms</li>
+              <li class="fragment">Deployment of disposable stacks</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Configuration Syntax</h3>
+            <ul>
+              <li class="fragment">HCL : <a href="https://github.com/hashicorp/hcl">Hashicorp Configuration Language</a></li>
+              <li class="fragment">JSON compatible : HCL parser can read JSON input</li>
+              <li class="fragment">Human oriented : less verbose, support for comments</li>
+              <li class="fragment">Variable interpolation support in Terraform</li>
+            </ul>
+          </section>
+          <section>
+            <h3>HCL syntax</h3>
+            <pre><code>
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
+resource "aws_eip" "default" {
+  instance = "${aws_instance.web.id}"
+  vpc      = true
+}
+
+# Some comment
+resource "aws_instance" "web" {
+  instance_type = "t2.micro"
+  ami = "${lookup(var.aws_amis, var.aws_region)}"
+  key_name = "${var.key_name}"
+  security_groups = ["${aws_security_group.default.name}"]
+  user_data = "${file("userdata.sh")}"
+  tags {
+    Name = "eip-example"
+  }
+}
+            </code></pre>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Terraform vs Cloudformation</h2>
+          </section>
+          <section>
+            <h3>Syntax</h3>
+            <ul>
+              <li class="fragment">Human friendly</li>
+              <li class="fragment">Less reliance on code generation tools (troposphere…)</li>
+              <li class="fragment">Automatic dependencies</li>
+              <li class="fragment">Richer interpolation</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Compatibility</h3>
+            <ul>
+              <li class="fragment">Support for multiple cloud platforms</li>
+              <li class="fragment">Support for other tools : Github, Grafana, Rundeck…</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Operations</h3>
+            <ul>
+              <li class="fragment">Well defined plan/apply workflow</li>
+              <li class="fragment">Can overwrite manual changes</li>
+              <li class="fragment">Manually created ressources can be imported</li>
+              <li class="fragment">Manual changes can be ignored</li>
+              <li class="fragment">In worst case scenarios : edit JSON state</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Pitfalls</h2>
+          </section>
+          <section>
+            <h3>HCL</h3>
+            <ul>
+              <li class="fragment">Declarative and datastructure oriented</li>
+              <li class="fragment">Lacks real conditionnal logic</li>
+              <li class="fragment">Iteration support does not cover all use cases</li>
+              <li class="fragment">Same issues with templating</li>
+              <li class="fragment">Possible solutions : Jsonnet, Jinja2 preprocessing</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Modularity</h3>
+            <ul>
+              <li class="fragment">Modules are a good way to organize code</li>
+              <li class="fragment">Customization support can get tricky</li>
+              <li class="fragment">Sometimes better to duplicate code than try to support every use case</li>
+              <li class="fragment">Do not try to write Jack of all trades modules</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Complexity</h3>
+            <ul>
+              <li class="fragment">Try to start simple and then iterate</li>
+              <li class="fragment">Inter-state dependecy is a nice feature</li>
+              <li class="fragment">But beware of cyclic dependencies</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Collaborative Operations</h3>
+            <ul>
+              <li class="fragment">Advanced features are provided by proprietary <a href="https://www.hashicorp.com/atlas.html">Atlas</a> tool</li>
+              <li class="fragment">In-house state locking is recommended</li>
+              <li class="fragment">Do not forget to centralize states to S3</li>
+              <li class="fragment">Forgetting to push code can have dire consequences…</li>
+              <li class="fragment">Global tagging feature missing</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Demo</h2>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Conclusion</h2>
+            Terraform has improved our integration and operationnal performances.<br>
+            It is still young and requires in-house tooling but it is growing fast.
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Questions ?</h2>
+            <img class="plain" src="qr_code.png">
+          </section>
+        </section>
+      </div>
+    </div>
+
+    <script src="../reveal.js/lib/js/head.min.js"></script>
+    <script src="../reveal.js/js/reveal.js"></script>
+
+    <script>
+      // More info https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        history: true,
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+          { src: '../reveal.js/plugin/markdown/marked.js' },
+          { src: '../reveal.js/plugin/markdown/markdown.js' },
+          { src: '../reveal.js/plugin/notes/notes.js', async: true },
+          { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+  </body>
+</html>
