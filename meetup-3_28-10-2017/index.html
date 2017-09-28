@@ -1,0 +1,137 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>Terraform</title>
+
+    <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="../reveal.js/css/theme/blood.css">
+
+    <!-- Theme used for syntax highlighting of code -->
+    <link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h2>AWS WAF with Lambda@Edge</h2>
+          <h3>Rennes AWS User Group</h3>
+        </section>
+        <section>
+          <h2>Who Am I ?</h2>
+          <ul>
+            <li class="fragment">Adrien Bréfort</li>
+            <li class="fragment">Public Cloud Lead DevOps at <a href="http://www.claranet.fr/">Claranet</a></li>
+            <li class="fragment">Working with AWS everyday</li>
+          </ul>
+        </section>
+        <section>
+          <section>
+            <h2>AWS WAF</h2>
+          </section>
+          <section>
+            <h3>What is it ?</h3>
+            <ul>
+              <li class="fragment">Basic WAF</li>
+              <li class="fragment">Small set of predefined rules</li>
+              <li class="fragment">Limited rate-limiting</li>
+              <li class="fragment">Can be used with CloudFront or an ALB</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Lambda@Edge</h2>
+          </section>
+          <section>
+            <h3>What is it ?</h3>
+            <ul>
+              <li class="fragment">Like Lambda</li>
+              <li class="fragment">Executed at edge locations</li>
+              <li class="fragment">With specific limits</li>
+              <li class="fragment">Network calls are now possible for origin events</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Use case</h2>
+          </section>
+          <section>
+            <h3>Issues</h3>
+            <ul>
+              <li class="fragment">Monitoring triggered randomly by light attacks</li>
+              <li class="fragment">Existing WAF rule updated by hand</li>
+              <li class="fragment">Lot of false alarms and manual labor</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Possible solutions</h3>
+            <ul>
+              <li class="fragment">AWS WAF rate limiting : threshold too high</li>
+              <li class="fragment">Cloudfront log analysis : log shipping too slow</li>
+              <li class="fragment">Application log analysis : non-trivial in this case</li>
+              <li class="fragment">Distributed fail2ban with redis and Nginx/Lua : autoscaling issues</li>
+            </ul>
+          </section>
+          <section>
+            <h3>Solution</h3>
+            <ul>
+              <li class="fragment">Lambda@Edge : Analyze origin responses</li>
+              <li class="fragment">DynamoDB : Count occurences</li>
+              <li class="fragment">Lambda : Block bad IPs</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Demo</h2>
+            <img class="plain" style="background-color:white;" src="demo.svg">
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Conclusion</h2>
+            It works !<br>
+            Pricing could be an issue for high traffic websites.
+          </section>
+        </section>
+        <section>
+          <section>
+            <h2>Questions ?</h2>
+            <img class="plain" src="qr_code.png">
+          </section>
+        </section>
+      </div>
+    </div>
+
+    <script src="../reveal.js/lib/js/head.min.js"></script>
+    <script src="../reveal.js/js/reveal.js"></script>
+
+    <script>
+      // More info https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        history: true,
+
+        // More info https://github.com/hakimel/reveal.js#dependencies
+        dependencies: [
+          { src: '../reveal.js/plugin/markdown/marked.js' },
+          { src: '../reveal.js/plugin/markdown/markdown.js' },
+          { src: '../reveal.js/plugin/notes/notes.js', async: true },
+          { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+        ]
+      });
+    </script>
+  </body>
+</html>
